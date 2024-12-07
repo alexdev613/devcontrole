@@ -19,6 +19,8 @@ export const authOptions: AuthOptions = {
         email: string;
       }
 
+      // console.log(session)
+
       return session;
     }
   }
