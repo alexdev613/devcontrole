@@ -37,7 +37,8 @@ export function NewCustomerForm({ userId }: { userId: string }) {
       userId: userId
     })
 
-    console.log(data);
+    // console.log(data);
+    router.refresh(); // força dar um refresh para buscar os dados no backend
     router.replace("/dashboard/customer");
 
   }
