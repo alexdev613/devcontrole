@@ -3,6 +3,35 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prismaClient from '@/lib/prisma';
 
+// Rotas: http://localhost:3000/api/customer
+
+export async function DELETE(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 401 })
+  }
+
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get("id");
+
+  try {
+    await prismaClient.customer.delete({
+      where: {
+        id: userId as string
+      }
+    })
+
+    return NextResponse.json({ message: "Cliente deletado com sucesso!"});
+
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json({ error: "Failed delete customer" }, {status: 400 })
+  }
+
+}
+
+// Rota para cadastrar um cliente
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 

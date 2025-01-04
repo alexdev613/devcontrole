@@ -40,6 +40,10 @@ export default async function Customer() {
             />
           ))}
         </section>
+
+        {customers.length === 0 && (
+          <h1 className='font-medium text-lg'>Você ainda não possui cliente</h1>
+        )}
       </main>
     </Container>
   )
