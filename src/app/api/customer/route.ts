@@ -15,6 +15,21 @@ export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("id");
 
+  if (!userId) {
+    return NextResponse.json({ error: "Failed delete customer"}, {status: 400});
+  }
+
+  // Para impedir o usuário de deletar um cliente que tem um ticket/chamado aberto atrelado:
+  const findTicket = await prismaClient.ticket.findFirst({
+    where: {
+      customerId: userId
+    }
+  })
+
+  if (findTicket) {
+    return NextResponse.json({ error: "Failed delete customer" }, { status: 400 });
+  }
+
   try {
     await prismaClient.customer.delete({
       where: {
