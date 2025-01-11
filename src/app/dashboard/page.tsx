@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation'
 import Link from "next/link";
 import { TicketItem } from "./components/ticket";
 
+import prismaClient from '@/lib/prisma'; // Para termos acesso ao nosso ORM Prisma e ao nosso banco de dados
+
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
 
@@ -13,7 +15,19 @@ export default async function Dashboard() {
     redirect("/")
   }
 
-  console.log(session);
+  // console.log(session);
+
+  const tickets = await prismaClient.ticket.findMany({
+    where: {
+      userId: session.user.id,
+      status: "ABERTO"
+    },
+    include: {
+      customer: true,
+    }
+  })
+
+  console.log(tickets);
 
   return (
     <Container>
@@ -34,8 +48,14 @@ export default async function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            <TicketItem />
-            <TicketItem />
+            {tickets.map(ticket => (
+              <TicketItem
+                key={ticket.id}
+                ticket={ticket}
+                customer={ticket.customer}
+              />
+            ))}
+
           </tbody>
         </table>
       </main>
