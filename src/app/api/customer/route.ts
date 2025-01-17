@@ -3,6 +3,34 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prismaClient from '@/lib/prisma';
 
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const customerEmail = searchParams.get("email");
+
+  // validar customerEmail como string para impedir erro no TypeScript, se customerEmail não existir ou for uma
+  // string vazia ou não encotrar o que foi passado no parâmetro, um erro not found é retornado e a função para
+  if (!customerEmail || customerEmail === "") {
+    return NextResponse.json({ error: "Customer not found" }, { status: 400 })
+  }
+
+  // Se o parâmetro foi preenchido, a função tentará buscar no banco de dados o email recebido no parâmetro
+  try {
+    const customer = await prismaClient.customer.findFirst({
+      where: {
+        email: customerEmail,
+      }
+    })
+
+    // Quando a requisição der certo, receberá objeto customer:
+    return NextResponse.json(customer);
+
+  } catch(err) {
+    return NextResponse.json({ error: "Customer not found" }, { status: 400 })
+  }
+
+  return NextResponse.json({ message: "RECEBIDO" });
+}
+
 // Rotas: http://localhost:3000/api/customer
 
 export async function DELETE(request: Request) {
